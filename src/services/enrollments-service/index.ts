@@ -40,14 +40,6 @@ async function getOneWithAddressByUserId(userId: number): Promise<GetOneWithAddr
   };
 }
 
-async function getEnrollmentIdByUserId(userId: number): Promise<number> {
-  const enrollment = await enrollmentRepository.findEnrollment(userId);
-
-  if (!enrollment) throw notFoundError();
-
-  return enrollment.id;
-}
-
 type GetOneWithAddressByUserIdResult = Omit<Enrollment, "userId" | "createdAt" | "updatedAt">;
 
 function getFirstAddress(firstAddress: Address): GetAddressResult {
@@ -61,8 +53,6 @@ type GetAddressResult = Omit<Address, "createdAt" | "updatedAt" | "enrollmentId"
 async function createOrUpdateEnrollmentWithAddress(params: CreateOrUpdateEnrollmentWithAddress) {
   const enrollment = exclude(params, "address");
   const address = getAddressForUpsert(params.address);
-
-  //TODO - Verificar se o CEP é válido
 
   const result = await getAddressFromCEP(address.cep);
   if (!result.uf) {
@@ -86,7 +76,6 @@ export type CreateOrUpdateEnrollmentWithAddress = CreateEnrollmentParams & {
 
 const enrollmentsService = {
   getOneWithAddressByUserId,
-  getEnrollmentIdByUserId,
   createOrUpdateEnrollmentWithAddress,
   getAddressFromCEP,
 };
