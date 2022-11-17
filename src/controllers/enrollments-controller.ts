@@ -1,11 +1,11 @@
 import { AuthenticatedRequest } from "@/middlewares";
-import { ViaCEPAddress } from "@/protocols";
 import enrollmentsService from "@/services/enrollments-service";
 import { Response } from "express";
 import httpStatus from "http-status";
 
 export async function getEnrollmentByUser(req: AuthenticatedRequest, res: Response) {
   const { userId } = req;
+  // const userId = 2;
 
   try {
     const enrollmentWithAddress = await enrollmentsService.getOneWithAddressByUserId(userId);
@@ -21,6 +21,7 @@ export async function postCreateOrUpdateEnrollment(req: AuthenticatedRequest, re
     await enrollmentsService.createOrUpdateEnrollmentWithAddress({
       ...req.body,
       userId: req.userId,
+      //  userId: 2,
     });
 
     return res.sendStatus(httpStatus.OK);
@@ -33,7 +34,7 @@ export async function getAddressFromCEP(req: AuthenticatedRequest, res: Response
   const { cep } = req.query as Record<string, string>;
 
   try {
-    const address = (await enrollmentsService.getAddressFromCEP(cep)) as ViaCEPAddress;
+    const address = await enrollmentsService.getAddressFromCEP(cep);
     return res.status(httpStatus.OK).send(address);
   } catch (error) {
     if (error.name === "NotFoundError") {
