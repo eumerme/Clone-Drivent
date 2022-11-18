@@ -7,7 +7,7 @@ export const postPaymentBody = Joi.object<PaymentBody>({
     issuer: Joi.string().required(),
     number: Joi.number().positive().required(),
     name: Joi.string().min(3).required(),
-    expirationDate: Joi.string().isoDate().required(),
+    expirationDate: Joi.string().required(),
     cvv: Joi.number().positive().required(),
   }).required(),
 });
