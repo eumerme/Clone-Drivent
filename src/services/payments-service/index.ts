@@ -2,7 +2,7 @@ import { badRequestError, notFoundError, unauthorizedError } from "@/errors";
 import { PaymentBody } from "@/protocols";
 import paymentRepository from "@/repositories/payment-repository";
 import ticketRepository from "@/repositories/ticket-repository";
-import { Enrollment, Payment, Ticket, TicketType } from "@prisma/client";
+import { Payment } from "@prisma/client";
 
 async function getPaymentByTicketId(ticketId: number, userId: number): Promise<Payment> {
   if (!ticketId) throw badRequestError();
@@ -28,9 +28,7 @@ async function createPayment(params: PaymentParams): Promise<Payment> {
   return payment;
 }
 
-type PaymentParams = PaymentBody & {
-  userId: number;
-};
+type PaymentParams = PaymentBody & { userId: number };
 
 async function validateTicketData(ticketId: number, userId: number): Promise<ValidateTicketData> {
   const ticket = await ticketRepository.findOneByTicketId(ticketId);
@@ -40,9 +38,9 @@ async function validateTicketData(ticketId: number, userId: number): Promise<Val
   return ticket;
 }
 
-type ValidateTicketData = Ticket & {
-  TicketType: TicketType;
-  Enrollment: Enrollment;
+type ValidateTicketData = {
+  TicketType: { price: number };
+  Enrollment: { userId: number };
 };
 
 const paymentsService = {
