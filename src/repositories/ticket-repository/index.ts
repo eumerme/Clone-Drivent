@@ -1,5 +1,5 @@
 import { prisma } from "@/config";
-import { Prisma } from "@prisma/client";
+import { Prisma, TicketStatus } from "@prisma/client";
 
 async function findWithTicketType(userId: number) {
   return prisma.ticket.findMany({
@@ -37,7 +37,7 @@ async function updateTicketStatus(id: number) {
   return prisma.ticket.update({
     where: { id },
     data: {
-      status: "PAID",
+      status: TicketStatus.PAID,
     },
   });
 }

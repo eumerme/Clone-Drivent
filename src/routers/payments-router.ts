@@ -6,7 +6,7 @@ import { Router } from "express";
 const paymentsRouter = Router();
 
 paymentsRouter
-  .all("/*", authenticateToken)
+  //.all("/*", authenticateToken)
   .get("/", (req, res) => {
     res.send("ok");
   })
