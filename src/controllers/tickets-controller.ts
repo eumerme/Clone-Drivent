@@ -6,7 +6,6 @@ import httpStatus from "http-status";
 
 export async function getTicket(req: AuthenticatedRequest, res: Response) {
   const { userId } = req;
-  //const userId = 2;
   try {
     const userTicket = await ticketsService.getWithTicketType(userId);
     return res.status(httpStatus.OK).send(userTicket);
