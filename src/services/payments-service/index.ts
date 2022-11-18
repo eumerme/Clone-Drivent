@@ -2,23 +2,19 @@ import { badRequestError, notFoundError, unauthorizedError } from "@/errors";
 import { PaymentBody } from "@/protocols";
 import paymentRepository from "@/repositories/payment-repository";
 import ticketRepository from "@/repositories/ticket-repository";
-import { Payment } from "@prisma/client";
+import { Enrollment, Payment, Ticket, TicketType } from "@prisma/client";
 
 async function getPaymentByTicketId(ticketId: number, userId: number): Promise<Payment> {
   if (!ticketId) throw badRequestError();
 
-  const ticket = await ticketRepository.findOneByTicketId(ticketId);
-  if (!ticket) throw notFoundError();
-  if (ticket.Enrollment.userId !== userId) throw unauthorizedError("Content not owned by user");
+  await validateTicketData(ticketId, userId);
 
   const payment = await paymentRepository.findPayment(ticketId);
   return payment;
 }
 
 async function createPayment(params: PaymentParams): Promise<Payment> {
-  const ticket = await ticketRepository.findOneByTicketId(params.ticketId);
-  if (!ticket) throw notFoundError();
-  if (ticket.Enrollment.userId !== params.userId) throw unauthorizedError("Content not owned by user");
+  const ticket = await validateTicketData(params.ticketId, params.userId);
 
   const data = {
     ticketId: params.ticketId,
@@ -34,6 +30,19 @@ async function createPayment(params: PaymentParams): Promise<Payment> {
 
 type PaymentParams = PaymentBody & {
   userId: number;
+};
+
+async function validateTicketData(ticketId: number, userId: number): Promise<ValidateTicketData> {
+  const ticket = await ticketRepository.findOneByTicketId(ticketId);
+  if (!ticket) throw notFoundError();
+  if (ticket.Enrollment.userId !== userId) throw unauthorizedError("Content not owned by user");
+
+  return ticket;
+}
+
+type ValidateTicketData = Ticket & {
+  TicketType: TicketType;
+  Enrollment: Enrollment;
 };
 
 const paymentsService = {
