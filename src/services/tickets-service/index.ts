@@ -4,7 +4,7 @@ import ticketRepository from "@/repositories/ticket-repository";
 import { Ticket, TicketStatus, TicketType } from "@prisma/client";
 
 async function getWithTicketType(userId: number): Promise<TicketWithType> {
-  const ticket = (await ticketRepository.findWithTicketType(userId))[0];
+  const ticket = await ticketRepository.findWithTicketType(userId);
   if (!ticket) throw notFoundError();
 
   return ticket;

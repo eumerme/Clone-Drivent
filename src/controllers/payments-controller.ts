@@ -8,7 +8,6 @@ export async function getPayment(req: AuthenticatedRequest, res: Response) {
   const { ticketId } = req.query as Record<string, string>;
   const id = Number(ticketId);
   const { userId } = req;
-  //const userId = 4;
 
   try {
     const payment = await paymentsService.getPaymentByTicketId(id, userId);
@@ -28,7 +27,6 @@ export async function postPayment(req: AuthenticatedRequest, res: Response) {
   try {
     const payment = await paymentsService.createPayment({
       ...req.body,
-      //userId: 2,
       userId: req.userId,
     });
 

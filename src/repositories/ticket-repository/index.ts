@@ -2,7 +2,7 @@ import { prisma } from "@/config";
 import { Prisma, TicketStatus } from "@prisma/client";
 
 async function findWithTicketType(userId: number) {
-  return prisma.ticket.findMany({
+  return prisma.ticket.findFirst({
     where: { Enrollment: { User: { id: userId } } },
     include: {
       TicketType: true,
