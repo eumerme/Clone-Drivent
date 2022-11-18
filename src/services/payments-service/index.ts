@@ -12,8 +12,6 @@ async function getPaymentByTicketId(ticketId: number, userId: number): Promise<P
   if (ticket.Enrollment.userId !== userId) throw unauthorizedError("Content not owned by user");
 
   const payment = await paymentRepository.findPayment(ticketId);
-  if (!payment) throw notFoundError();
-
   return payment;
 }
 

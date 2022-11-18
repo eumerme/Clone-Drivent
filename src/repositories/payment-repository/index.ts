@@ -2,8 +2,8 @@ import { prisma } from "@/config";
 import { Prisma } from "@prisma/client";
 
 async function findPayment(ticketId: number) {
-  return prisma.payment.findUnique({
-    where: { id: ticketId },
+  return prisma.payment.findFirst({
+    where: { ticketId },
   });
 }
 
