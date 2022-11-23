@@ -1,8 +1,8 @@
 import { ApplicationError } from "@/protocols";
 
-export function badRequestError(): ApplicationError {
+export function badRequestError(message = "Missing data"): ApplicationError {
   return {
     name: "BadRequestError",
-    message: "Missing data",
+    message,
   };
 }
