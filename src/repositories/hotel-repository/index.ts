@@ -1,5 +1,5 @@
 import { prisma } from "@/config";
-import { Hotel, Prisma } from "@prisma/client";
+import { Hotel } from "@prisma/client";
 
 async function findMany(): Promise<Hotel[]> {
   return prisma.hotel.findMany();
