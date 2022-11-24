@@ -70,6 +70,8 @@ describe("GET /hotels", () => {
     });
 
     it("should respond with status 200 and with hotel data", async () => {
+      //TODO corrigir esse teste
+
       const user = await createUser();
       const token = await generateValidToken(user);
       const enrollment = await createEnrollmentWithAddress(user);

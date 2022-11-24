@@ -36,12 +36,27 @@ async function updateTicketStatus(id: number) {
   });
 }
 
+async function findTicketsWithHotel(userId: number) {
+  return prisma.ticket.findFirst({
+    where: {
+      AND: [
+        {
+          Enrollment: { userId },
+          TicketType: { isRemote: false, includesHotel: true },
+          status: TicketStatus.PAID,
+        },
+      ],
+    },
+  });
+}
+
 const ticketRepository = {
   findWithTicketType,
   findTicketType,
   create,
   findOneByTicketId,
   updateTicketStatus,
+  findTicketsWithHotel,
 };
 
 export default ticketRepository;
