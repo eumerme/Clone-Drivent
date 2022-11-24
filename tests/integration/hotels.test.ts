@@ -7,6 +7,7 @@ import supertest from "supertest";
 import {
   createEnrollmentWithAddress,
   createHotel,
+  createRooms,
   createTicket,
   createTicketType,
   createTicketTypeWithHotel,
@@ -95,6 +96,79 @@ describe("GET /hotels", () => {
           }),
         ]),
       );
+    });
+  });
+});
+
+describe("GET /hotels/:hotelId", () => {
+  it("should respond with status 401 if no token is given", async () => {
+    const hotel = await createHotel();
+    const hotelId = hotel.id;
+
+    const response = await server.get(`/hotels/${hotelId}`);
+
+    expect(response.status).toBe(httpStatus.UNAUTHORIZED);
+  });
+
+  it("should responde with status 401 if given token is not valid", async () => {
+    const token = faker.lorem.word();
+    const hotel = await createHotel();
+    const hotelId = hotel.id;
+
+    const response = await server.get(`/hotels/${hotelId}`).set("Authorizathion", `Bearer ${token}`);
+
+    expect(response.status).toBe(httpStatus.UNAUTHORIZED);
+  });
+
+  it("should responde with status 401 if there is no session for given token", async () => {
+    const userWithoutSession = await createUser();
+    const token = jwt.sign({ userId: userWithoutSession.id }, process.env.JWT_SECRET);
+    const hotel = await createHotel();
+    const hotelId = hotel.id;
+
+    const response = await server.get(`/hotels/${hotelId}`).set("Authorizathion", `Bearer ${token}`);
+
+    expect(response.status).toBe(httpStatus.UNAUTHORIZED);
+  });
+
+  describe("when token is valid", () => {
+    it("should respond with status 404 when hotel doesn't exist", async () => {
+      const user = await createUser();
+      const token = await generateValidToken(user);
+      const hotelId = 0;
+
+      const response = await server.get(`/hotels/${hotelId}`).set("Authorization", `Bearer ${token}`);
+
+      expect(response.status).toBe(httpStatus.NOT_FOUND);
+    });
+
+    it("should respond with status 200 with hotel's rooms data", async () => {
+      const user = await createUser();
+      const token = await generateValidToken(user);
+      const hotel = await createHotel();
+      const hotelId = hotel.id;
+      const room = await createRooms(hotel.id);
+
+      const response = await server.get(`/hotels/${hotelId}`).set("Authorization", `Bearer ${token}`);
+
+      expect(response.status).toBe(httpStatus.OK);
+      expect(response.body).toEqual([
+        {
+          id: room.id,
+          name: expect.any(String),
+          capacity: room.capacity,
+          hotelId: hotel.id,
+          createdAt: expect.any(String),
+          updatedAt: expect.any(String),
+          Hotel: {
+            id: hotel.id,
+            name: hotel.name,
+            image: hotel.image,
+            createdAt: hotel.createdAt.toISOString(),
+            updatedAt: hotel.updatedAt.toISOString(),
+          },
+        },
+      ]);
     });
   });
 });
