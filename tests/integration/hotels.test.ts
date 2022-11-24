@@ -9,6 +9,7 @@ import {
   createHotel,
   createTicket,
   createTicketType,
+  createTicketTypeWithHotel,
   createUser,
   generateCreditCardData,
 } from "../factories";
@@ -49,7 +50,7 @@ describe("GET /hotels", () => {
   });
 
   describe("when token is valid", () => {
-    it("should respond with status 404 when user doesnt have an enrollment yet", async () => {
+    it("should respond with status 404 when user doesn't have an enrollment yet", async () => {
       const token = await generateValidToken();
 
       const response = await server.get("/hotels").set("Authorization", `Bearer ${token}`);
@@ -57,7 +58,7 @@ describe("GET /hotels", () => {
       expect(response.status).toBe(httpStatus.NOT_FOUND);
     });
 
-    it("should respond with status 400 when user's ticket type doesn't include hotel", async () => {
+    it("should respond with status 404 when user's ticket type doesn't include hotel", async () => {
       const user = await createUser();
       const token = await generateValidToken(user);
       const enrollment = await createEnrollmentWithAddress(user);
@@ -66,16 +67,14 @@ describe("GET /hotels", () => {
 
       const response = await server.get("/hotels").set("Authorization", `Bearer ${token}`);
 
-      expect(response.status).toBe(httpStatus.BAD_REQUEST);
+      expect(response.status).toBe(httpStatus.NOT_FOUND);
     });
 
     it("should respond with status 200 and with hotel data", async () => {
-      //TODO corrigir esse teste
-
       const user = await createUser();
       const token = await generateValidToken(user);
       const enrollment = await createEnrollmentWithAddress(user);
-      const ticketType = await createTicketType();
+      const ticketType = await createTicketTypeWithHotel();
       const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.RESERVED);
       const hotel = await createHotel();
 
@@ -84,18 +83,18 @@ describe("GET /hotels", () => {
 
       const response = await server.get("/hotels").set("Authorization", `Bearer ${token}`);
 
-      if (!ticketType.isRemote || ticketType.includesHotel) {
-        expect(response.status).toBe(httpStatus.OK);
-        expect(response.body).toEqual([
-          {
+      expect(response.status).toBe(httpStatus.OK);
+      expect(response.body).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
             id: hotel.id,
             name: hotel.name,
             image: hotel.image,
             createdAt: hotel.createdAt.toISOString(),
             updatedAt: hotel.updatedAt.toISOString(),
-          },
-        ]);
-      }
+          }),
+        ]),
+      );
     });
   });
 });
