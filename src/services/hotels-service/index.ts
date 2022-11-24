@@ -1,7 +1,7 @@
 import { notFoundError } from "@/errors";
 import hotelRepository from "@/repositories/hotel-repository";
 import ticketRepository from "@/repositories/ticket-repository";
-import { Hotel } from "@prisma/client";
+import { Hotel, Room } from "@prisma/client";
 
 async function findHotels(userId: number): Promise<Hotel[]> {
   const ticket = await ticketRepository.findTicketsWithHotel(userId);
@@ -11,8 +11,18 @@ async function findHotels(userId: number): Promise<Hotel[]> {
   return hotels;
 }
 
+async function findHotelWithRooms(hotelId: number): Promise<HotelRooms[]> {
+  const hotelRooms = await hotelRepository.findHotelRooms(hotelId);
+  if (!hotelRooms) throw notFoundError();
+
+  return hotelRooms;
+}
+
+type HotelRooms = Room & { Hotel: Hotel };
+
 const hotelsService = {
   findHotels,
+  findHotelWithRooms,
 };
 
 export default hotelsService;
