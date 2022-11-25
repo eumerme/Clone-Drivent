@@ -20,13 +20,3 @@ export async function createRoom(hotelId: number): Promise<Room> {
     },
   });
 }
-
-/* 
-export async function findHotelWithRoom(hotelId: number): Promise<HotelRooms[]> {
-  return prisma.hotel.findMany({
-    where: { id: hotelId },
-    include: { Rooms: true },
-  });
-}
-
-type HotelRooms = Hotel & { Rooms: Room[] }; */
