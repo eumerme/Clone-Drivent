@@ -11,14 +11,14 @@ async function findHotels(userId: number): Promise<Hotel[]> {
   return hotels;
 }
 
-async function findHotelWithRooms(hotelId: number): Promise<HotelRooms[]> {
+async function findHotelWithRooms(hotelId: number): Promise<HotelRooms> {
   const hotelRooms = await hotelRepository.findHotelRooms(hotelId);
-  if (!hotelRooms[0]) throw notFoundError();
+  if (!hotelRooms) throw notFoundError();
 
   return hotelRooms;
 }
 
-type HotelRooms = Room & { Hotel: Hotel };
+type HotelRooms = Hotel & { Rooms: Room[] };
 
 const hotelsService = { findHotels, findHotelWithRooms };
 

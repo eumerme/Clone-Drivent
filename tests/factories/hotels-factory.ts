@@ -11,15 +11,22 @@ export async function createHotel(): Promise<Hotel> {
   });
 }
 
-export async function createRooms(hotelId: number): Promise<HotelRooms> {
+export async function createRoom(hotelId: number): Promise<Room> {
   return prisma.room.create({
     data: {
       name: faker.name.findName(),
       capacity: faker.datatype.number(),
       hotelId,
     },
-    include: { Hotel: true },
   });
 }
 
-type HotelRooms = Room & { Hotel: Hotel };
+/* 
+export async function findHotelWithRoom(hotelId: number): Promise<HotelRooms[]> {
+  return prisma.hotel.findMany({
+    where: { id: hotelId },
+    include: { Rooms: true },
+  });
+}
+
+type HotelRooms = Hotel & { Rooms: Room[] }; */
