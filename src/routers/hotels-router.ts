@@ -1,6 +1,6 @@
-import { getHotels, getHotelWithRooms } from "@/controllers";
-import { authenticateToken } from "@/middlewares";
 import { Router } from "express";
+import { authenticateToken } from "@/middlewares";
+import { getHotels, getHotelWithRooms } from "@/controllers";
 
 const hotelsRouter = Router();
 
