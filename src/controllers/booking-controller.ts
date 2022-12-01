@@ -1,4 +1,3 @@
-import { badRequestError } from "@/errors";
 import { AuthenticatedRequest } from "@/middlewares";
 import bookingService from "@/services/booking-service";
 import { Booking } from "@prisma/client";
@@ -19,8 +18,6 @@ export async function postBooking(req: AuthenticatedRequest, res: Response) {
   const { userId } = req;
   const { roomId } = req.body as RoomId;
   try {
-    // if (roomId <= 0) throw badRequestError();
-
     const booking = await bookingService.postBooking(userId, roomId);
     return res.status(httpStatus.OK).send({ bookingId: booking.id });
   } catch (error) {

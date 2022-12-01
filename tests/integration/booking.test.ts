@@ -6,6 +6,7 @@ import httpStatus from "http-status";
 import * as jwt from "jsonwebtoken";
 import supertest from "supertest";
 import {
+  createBooking,
   createEnrollmentWithAddress,
   createHotel,
   createPayment,
@@ -16,7 +17,6 @@ import {
   createTicketTypeWithHotel,
   createUser,
 } from "../factories";
-import { createBooking } from "../factories/booking-factory";
 import { cleanDb, generateValidToken } from "../helpers";
 
 beforeAll(async () => {
@@ -151,8 +151,7 @@ describe("POST /booking", () => {
       const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
       await createPayment(ticket.id, ticketType.price);
       const hotel = await createHotel();
-      const room = await createRoom(hotel.id);
-      await createBooking(user.id, room.id);
+      await createRoom(hotel.id);
 
       const response = await server.post("/booking").set("Authorization", `Bearer ${token}`).send({});
 
