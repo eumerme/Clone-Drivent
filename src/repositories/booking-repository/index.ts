@@ -1,15 +1,29 @@
 import { prisma } from "@/config";
-import { Room } from "@prisma/client";
+import { Booking, Room } from "@prisma/client";
 
-async function findBooking(userId: number): Promise<Booking> {
+async function findBooking(userId: number): Promise<BookingData> {
   return prisma.booking.findFirst({
     where: { userId },
     select: { id: true, Room: true },
   });
 }
 
-type Booking = { id: number; Room: Room };
+async function createBooking(userId: number, roomId: number): Promise<Booking> {
+  return prisma.booking.create({
+    data: { userId, roomId },
+  });
+}
 
-const bookingRepository = { findBooking };
+async function findRoomWithBooking(roomId: number): Promise<RoomWithBooking> {
+  return prisma.room.findUnique({
+    where: { id: roomId },
+    include: { Booking: true },
+  });
+}
+
+type BookingData = { id: number; Room: Room };
+type RoomWithBooking = Room & { Booking: Booking[] };
+
+const bookingRepository = { findBooking, createBooking, findRoomWithBooking };
 
 export default bookingRepository;
