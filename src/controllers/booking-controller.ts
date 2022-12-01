@@ -19,11 +19,14 @@ export async function postBooking(req: AuthenticatedRequest, res: Response) {
   const { userId } = req;
   const { roomId } = req.body as RoomId;
   try {
-    if (roomId <= 0) throw badRequestError();
+    // if (roomId <= 0) throw badRequestError();
 
-    const bookingId = await bookingService.postBooking(userId, roomId);
-    return res.status(httpStatus.OK).send(bookingId);
+    const booking = await bookingService.postBooking(userId, roomId);
+    return res.status(httpStatus.OK).send({ bookingId: booking.id });
   } catch (error) {
+    if (error.name === "ForbiddenError") {
+      return res.sendStatus(httpStatus.FORBIDDEN);
+    }
     return res.sendStatus(httpStatus.NOT_FOUND);
   }
 }
