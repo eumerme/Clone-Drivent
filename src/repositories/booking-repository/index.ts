@@ -4,7 +4,11 @@ import { Booking, Room } from "@prisma/client";
 async function findBooking(userId: number): Promise<BookingData> {
   return prisma.booking.findFirst({
     where: { userId },
-    select: { id: true, Room: true },
+    select: {
+      id: true,
+      userId: true,
+      Room: true,
+    },
   });
 }
 
@@ -14,16 +18,41 @@ async function createBooking(userId: number, roomId: number): Promise<Booking> {
   });
 }
 
-async function findRoomWithBooking(roomId: number): Promise<RoomWithBooking> {
+async function findRoomWithBooking(id: number): Promise<RoomWithBooking> {
   return prisma.room.findUnique({
-    where: { id: roomId },
+    where: { id },
     include: { Booking: true },
   });
 }
 
-type BookingData = { id: number; Room: Room };
+async function updateBooking(id: number, roomId: number): Promise<{ id: number }> {
+  return prisma.booking.update({
+    where: { id },
+    data: { roomId },
+    select: { id: true },
+  });
+}
+
+async function findBookingById(id: number): Promise<Booking> {
+  return prisma.booking.findUnique({
+    where: { id },
+  });
+}
+
+type BookingData = {
+  id: number;
+  userId: number;
+  Room: Room;
+};
+
 type RoomWithBooking = Room & { Booking: Booking[] };
 
-const bookingRepository = { findBooking, createBooking, findRoomWithBooking };
+const bookingRepository = {
+  findBooking,
+  createBooking,
+  findRoomWithBooking,
+  updateBooking,
+  findBookingById,
+};
 
 export default bookingRepository;

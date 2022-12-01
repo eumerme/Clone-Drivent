@@ -28,4 +28,16 @@ export async function postBooking(req: AuthenticatedRequest, res: Response) {
   }
 }
 
+export async function putBooking(req: AuthenticatedRequest, res: Response) {
+  const { userId } = req;
+  const { roomId } = req.body as RoomId;
+  const { bookingId } = req.params as Record<string, string>;
+  try {
+    const updatedBooking = await bookingService.putBooking(userId, roomId, Number(bookingId));
+    return res.status(httpStatus.OK).send({ bookingId: updatedBooking.id });
+  } catch (error) {
+    return res.sendStatus(httpStatus.NOT_FOUND);
+  }
+}
+
 export type RoomId = Pick<Booking, "roomId">;
