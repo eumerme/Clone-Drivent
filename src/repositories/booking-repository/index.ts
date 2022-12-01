@@ -6,7 +6,6 @@ async function findBooking(userId: number): Promise<BookingData> {
     where: { userId },
     select: {
       id: true,
-      userId: true,
       Room: true,
     },
   });
@@ -41,7 +40,6 @@ async function findBookingById(id: number): Promise<Booking> {
 
 type BookingData = {
   id: number;
-  userId: number;
   Room: Room;
 };
 

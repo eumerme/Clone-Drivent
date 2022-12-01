@@ -1,6 +1,5 @@
 import { forbiddenError, notFoundError, unauthorizedError } from "@/errors";
 import bookingRepository from "@/repositories/booking-repository";
-import { exclude } from "@/utils/prisma-utils";
 import { isValidTicket } from "@/utils/ticket-utils";
 
 async function bookingData(userId: number) {
@@ -19,8 +18,7 @@ async function getBooking(userId: number) {
   await isValidTicket(userId);
 
   const booking = await bookingData(userId);
-
-  return { ...exclude(booking, "userId") };
+  return booking;
 }
 
 async function postBooking(userId: number, roomId: number) {
@@ -32,11 +30,11 @@ async function postBooking(userId: number, roomId: number) {
 }
 
 async function putBooking(userId: number, roomId: number, bookingId: number) {
-  await isValidTicket(userId);
   await bookingData(userId);
 
-  const booking = await bookingData(userId);
-  if (booking.userId !== userId) throw unauthorizedError();
+  const bookingExists = await bookingRepository.findBookingById(bookingId);
+  if (!bookingExists) throw notFoundError();
+  if (bookingExists.userId !== userId) throw unauthorizedError();
 
   await roomData(roomId);
 
