@@ -215,7 +215,23 @@ describe("POST /booking", () => {
       expect(response.status).toBe(httpStatus.FORBIDDEN);
     });
 
-    it("should respond with status 200 and with bookingId", async () => {
+    it("should respond with status 409 when user already has a booking", async () => {
+      const user = await createUser();
+      const token = await generateValidToken(user);
+      const enrollment = await createEnrollmentWithAddress(user);
+      const ticketType = await createTicketTypeWithHotel();
+      const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
+      await createPayment(ticket.id, ticketType.price);
+      const hotel = await createHotel();
+      const room = await createRoom(hotel.id);
+      await createBooking(user.id, room.id);
+
+      const response = await server.post("/booking").set("Authorization", `Bearer ${token}`).send({ roomId: room.id });
+
+      expect(response.status).toBe(httpStatus.CONFLICT);
+    });
+
+    it("should respond with status 200 and bookingId", async () => {
       const user = await createUser();
       const token = await generateValidToken(user);
       const enrollment = await createEnrollmentWithAddress(user);
